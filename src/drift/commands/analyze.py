@@ -28,7 +28,7 @@ from drift.errors import EXIT_FINDINGS_ABOVE_THRESHOLD
     "--format",
     "-f",
     "output_format",
-    type=click.Choice(["rich", "json", "sarif", "agent-tasks", "github"]),
+    type=click.Choice(["rich", "json", "sarif", "agent-tasks", "github" , "csv"]),
     default="rich",
     help="Output format.",
 )
@@ -239,6 +239,17 @@ def analyze(
             click.echo(f"Output written to {output_file}", err=True)
         else:
             click.echo(json_text)
+
+    elif output_format == "csv":
+        from drift.output.csv_output import analysis_to_csv
+
+        csv_text = analysis_to_csv(analysis, compact=compact_json)
+        if output_file:
+            output_file.write_text(csv_text + "\n", encoding="utf-8")
+            click.echo(f"Output written to {output_file}", err=True)
+        else:
+            click.echo(csv_text)
+
     elif output_format == "sarif":
         from drift.output.json_output import findings_to_sarif
 
